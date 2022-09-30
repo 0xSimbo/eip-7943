@@ -1,10 +1,18 @@
 // SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.8.0;
 
-/// @author 0xSimon_
+
+///@author Twitter: @0xSimon_
+
+
+enum Status {
+    NOT_SET,
+    FALSE,
+    TRUE
+}
 struct TrademarkInformation {
-    bool isCC0;
-    bool isLogoPublicDomain;
+    Status isCC0;
+    Status isLogoPublicDomain;
     string trademarkDocumentLink;
 }
 interface IERC7943{
@@ -15,7 +23,3 @@ interface IERC7943{
     function updateTrademarkInformation(TrademarkInformation memory newTrademarkInformation) external;
 
 }
-    // function isCC0() external view returns(bool);
-    // function isLogoPublicDomain() external view returns(bool);
-    // function extraIPInformation() external view returns(string memory);
-    // function setExtraIPInformation(string memory url) external;

@@ -2,17 +2,14 @@
 pragma solidity ^0.8.0;
 import "./interfaces/IERC7943.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
- 
-/// @author 0xSimon)
- 
-contract ERC1111  is IERC7943,ERC721{
+/// @author 0xSimon_
+contract ERC7943  is IERC7943,ERC721{
     TrademarkInformation private trademarkInformation = TrademarkInformation({
-        isCC0:false,
-        isLogoPublicDomain:false,
-        trademarkDocumentLink:"https://project-xyz.io/ip_agreement"
+        isCC0:Status.TRUE,
+        isLogoPublicDomain:Status.TRUE,
+        trademarkDocumentLink:"https://project-xyz.io/trademarkDocuments"
     });
     constructor(string memory name, string memory symbol)
- 
     ERC721(name,symbol)
     {}
     function hasFullIPRights(address holder, uint tokenId) external view virtual override returns(bool){

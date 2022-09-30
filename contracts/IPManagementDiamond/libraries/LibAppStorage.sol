@@ -6,9 +6,12 @@ import {Status} from "../structs/TrademarkInformation.sol";
 error DoesNotSupportIERC721();
 error NotERC721Owner();
 error DelegateContractNotSet();
+error ZeroContract();
+error DoesNotSupportIERC7943();
 ///@author @0xSimon_
 library LibAppStorage {
     bytes4 internal constant IERC721_INTERFACE_ID = 0x80ac58cd;
+    bytes4 internal constant IERC7943_INTERFACE_ID = 0xadbfd142;
     bytes32 internal constant NAMESPACE = keccak256("ip.management.appstorage");
 
        function appStorage() internal pure returns(AppStorage storage s)  {
@@ -65,16 +68,19 @@ library LibAppStorage {
         AppStorage storage s = appStorage();
         if(!MinimalOwnableIERC721(contractAddress).supportsInterface(IERC721_INTERFACE_ID)) revert DoesNotSupportIERC721();
         if(msg.sender != MinimalOwnableIERC721(contractAddress).owner()) revert NotERC721Owner();
+        if(!MinimalIERC7943(delegateContract).supportsInterface(IERC7943_INTERFACE_ID)) revert  DoesNotSupportIERC7943();
         s.trademarkInformation[contractAddress].delegateContract = delegateContract;
         }
 
     function hasFullIPRights(address tokenContract,address holder,uint tokenId) internal view returns(bool) {
         AppStorage storage s = appStorage();
         //If tokenContract Supports The Interface
-        if(MinimalOwnableIERC721(tokenContract).supportsInterface(IERC721_INTERFACE_ID)) {
+        if(!MinimalOwnableIERC721(tokenContract).supportsInterface(IERC721_INTERFACE_ID)) revert DoesNotSupportIERC721();
+        if(MinimalOwnableIERC721(tokenContract).supportsInterface(IERC7943_INTERFACE_ID)) {
             return MinimalIERC7943(tokenContract).hasFullIPRights(holder,tokenId);
         }
         address delegateContract = s.trademarkInformation[tokenContract].delegateContract;
+        if(delegateContract == address(0)) revert ZeroContract();
         return MinimalIERC7943(delegateContract).hasFullIPRights(holder,tokenId);
     }
 
@@ -87,4 +93,5 @@ interface MinimalOwnableIERC721 {
 }
 interface MinimalIERC7943{
     function hasFullIPRights(address holder,uint tokenId) external view returns(bool);
+    function supportsInterface(bytes4 interfaceId) external view returns(bool);
 }
